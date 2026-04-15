@@ -59,17 +59,3 @@ Vite will print a local URL (usually `http://localhost:5173`).
 
 - `/users` - users list with pagination
 - `/users/:userId/achievements` - achievements dashboard for a user
-
-## Useful Commands
-
-```bash
-npm run lint
-npm run build
-npm run preview
-```
-
-## Quick Troubleshooting
-
-- If API calls fail, confirm backend is running and `VITE_API_BASE_URL` is correct.
-- If env changes are not picked up, restart `npm run dev`.
-- If dependencies fail to install, delete `node_modules` + `package-lock.json`, then run `npm install` again.
