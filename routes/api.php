@@ -1,8 +1,14 @@
 <?php
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\Api\ActionController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+Route::get('/users', [ActionController::class, 'users'])->name('users.index');
+
+Route::prefix('users/{user}')
+        ->name('users.')
+        ->controller(ActionController::class)
+        ->group(function () {
+            Route::post('/purchase', 'purchase')->name('purchase');
+            Route::get('/achievements', 'achievements')->name('achievements');
+        })->whereNumber(['user']);
