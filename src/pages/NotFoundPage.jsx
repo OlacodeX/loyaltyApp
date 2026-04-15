@@ -4,7 +4,7 @@ function NotFoundPage() {
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-5xl items-center justify-center p-6">
       <section className="w-full max-w-xl rounded-2xl bg-white p-8 shadow-sm ring-1 ring-slate-200">
-        <p className="text-sm font-semibold text-indigo-600">404</p>
+        <p className="text-sm font-semibold text-red-600">404</p>
         <h1 className="mt-2 text-2xl font-semibold text-slate-900">
           Page not found
         </h1>
@@ -13,14 +13,8 @@ function NotFoundPage() {
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
           <Link
-            to="/"
-            className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-500"
-          >
-            Go to home
-          </Link>
-          <Link
             to="/users"
-            className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+            className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-500"
           >
             Open users page
           </Link>

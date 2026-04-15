@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { useAchievementsStore } from '../store/useAchievementsStore.js'
+import StateCard from '../components/StateCard.jsx'
+import { useAchievementsStore } from '../store.js'
 
 const ProgressBar = ({ value, maxValue }) => {
   const safeMax = Math.max(maxValue, 0)
@@ -15,7 +16,7 @@ const ProgressBar = ({ value, maxValue }) => {
       </div>
       <div className="h-2.5 overflow-hidden rounded-full bg-slate-200">
         <div
-          className="h-full rounded-full bg-indigo-600 transition-all"
+          className="h-full rounded-full bg-red-600 transition-all"
           style={{ width: `${percent}%` }}
         />
       </div>
@@ -23,9 +24,29 @@ const ProgressBar = ({ value, maxValue }) => {
   )
 }
 
+const clamp = (value, min, max) => Math.min(Math.max(value, min), max)
+
+const getProgressPercent = (data) => {
+  const remaining = Number(data?.remaining_to_unlock_next_badge ?? 0)
+  const nextBadgeAmount = Number(data?.next_badge_amount ?? 0)
+
+  if (Number.isFinite(nextBadgeAmount) && nextBadgeAmount > 0) {
+    const progressValue = nextBadgeAmount - Math.max(remaining, 0)
+    return clamp(
+      Math.round((progressValue / nextBadgeAmount) * 100),
+      0,
+      100,
+    )
+  }
+
+  return remaining <= 0 ? 100 : 0
+}
+
 function AchievementsDashboard() {
   const { userId } = useParams()
   const { data, isLoading, error, fetchAchievements } = useAchievementsStore()
+  const unlockedAchievements = data?.unlocked_achievements || []
+  const nextAvailableAchievements = data?.next_available_achievements || []
 
   useEffect(() => {
     if (userId) {
@@ -33,15 +54,14 @@ function AchievementsDashboard() {
     }
   }, [fetchAchievements, userId])
 
-  const unlockedCount = data.unlocked_achievements.length
-  const remaining = data.remaining_to_unlock_next_badge
-  const maxForBar = unlockedCount + Math.max(remaining, 0)
+  const remaining = data?.remaining_to_unlock_next_badge || 0
+  const progressPercent = getProgressPercent(data)
 
   return (
     <main className="mx-auto min-h-screen w-full max-w-5xl p-4 sm:p-6 lg:p-8">
       <div className="mb-6 flex items-center justify-between gap-3">
         <div>
-          <p className="text-sm text-slate-500">Customer</p>
+          <p className="text-sm text-slate-500">User</p>
           <h1 className="text-2xl font-semibold text-slate-900 sm:text-3xl">
             {userId}
           </h1>
@@ -55,15 +75,15 @@ function AchievementsDashboard() {
       </div>
 
       {isLoading && (
-        <section className="rounded-2xl bg-white p-6 text-slate-600 shadow-sm ring-1 ring-slate-200">
+        <StateCard>
           Loading achievements...
-        </section>
+        </StateCard>
       )}
 
       {!isLoading && error && (
-        <section className="rounded-2xl border border-red-200 bg-red-50 p-6 text-red-700">
+        <StateCard tone="error">
           {error}
-        </section>
+        </StateCard>
       )}
 
       {!isLoading && !error && (
@@ -72,13 +92,13 @@ function AchievementsDashboard() {
             <h2 className="text-lg font-semibold text-slate-900">
               Unlocked Achievements
             </h2>
-            {data.unlocked_achievements.length === 0 ? (
+            {unlockedAchievements.length === 0 ? (
               <p className="mt-4 text-sm text-slate-600">
                 No achievements unlocked yet.
               </p>
             ) : (
               <ul className="mt-4 grid gap-2 sm:grid-cols-2">
-                {data.unlocked_achievements.map((achievement) => (
+                {unlockedAchievements.map((achievement) => (
                   <li
                     key={achievement}
                     className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-800"
@@ -111,7 +131,7 @@ function AchievementsDashboard() {
               </div>
             </dl>
             <div className="mt-6">
-              <ProgressBar value={unlockedCount} maxValue={maxForBar} />
+              <ProgressBar value={progressPercent} maxValue={100} />
             </div>
           </section>
 
@@ -119,16 +139,16 @@ function AchievementsDashboard() {
             <h2 className="text-lg font-semibold text-slate-900">
               Next Available Achievements
             </h2>
-            {data.next_available_achievements.length === 0 ? (
+            {nextAvailableAchievements.length === 0 ? (
               <p className="mt-4 text-sm text-slate-600">
                 No upcoming achievements available right now.
               </p>
             ) : (
               <ul className="mt-4 flex flex-wrap gap-2">
-                {data.next_available_achievements.map((achievement) => (
+                {nextAvailableAchievements.map((achievement) => (
                   <li
                     key={achievement}
-                    className="rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1 text-xs font-medium text-indigo-700"
+                    className="rounded-full border border-red-200 bg-red-50 px-3 py-1 text-xs font-medium text-red-700"
                   >
                     {achievement}
                   </li>
