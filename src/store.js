@@ -60,10 +60,6 @@ export const usersStore = create((set, get) => ({
         ...state.purchaseAmountByUserId,
         [currentUserId]: '',
       },
-      purchaseResultByUserId: {
-        ...state.purchaseResultByUserId,
-        [currentUserId]: null,
-      },
     }))
   },
 
