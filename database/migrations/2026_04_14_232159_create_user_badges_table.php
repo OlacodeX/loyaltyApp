@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('user_badges', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignUuid('user_id')->constrained()->cascadeOnDelete();
             $table->foreignId('badge_id')->constrained()->cascadeOnDelete();
             $table->timestamp('unlocked_at');
             $table->timestamps();
