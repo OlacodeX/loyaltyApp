@@ -7,11 +7,13 @@ use App\Events\BadgeUnlocked;
 use App\Events\PurchaseCompleted;
 use App\Models\Achievement;
 use App\Models\Badge;
+use Illuminate\Support\Facades\Log;
 
 class UnlockLoyaltyOnPurchase
 {
     public function handle(PurchaseCompleted $event): void
     {
+        Log::info('UnlockLoyaltyOnPurchase', ['user' => $event->user->id]);
         $user = $event->user->fresh();
         if (!$user) {
             return;
@@ -38,7 +40,7 @@ class UnlockLoyaltyOnPurchase
             'min_total_orders' => $user->total_orders,
             'min_total_spent' => $user->total_spent,
         ])->first();
-        
+
         if (!$attainedBadge) {
             return;
         }

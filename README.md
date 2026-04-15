@@ -1,39 +1,40 @@
-# Loyalty App
+# Loyalty App (Laravel 13)
 
-Laravel 13 API for a simple loyalty program: users accumulate **total orders** and **total spent** (Naira), unlock **achievements** and **badges** from seeded catalog rules, and expose progress over HTTP.
+Simple loyalty API for users, achievements, and badges.
 
 ## Requirements
 
-- **PHP** 8.3 or newer
-- **Composer** 2.x
-- **Database**: MySQL/MariaDB or SQLite
+- PHP `8.3+`
+- Composer `2+`
+- MySQL or MariaDB
 
-## 1. Clone and install PHP dependencies
+## Setup on a new machine
+
+### 1) Install dependencies
 
 ```bash
-cd loyalty-app
 composer install
 ```
 
-## 2. Environment file
+### 2) Create env file and app key
 
-Copy the example env and generate an application key:
+Linux/macOS/Git Bash:
 
 ```bash
 cp .env.example .env
 php artisan key:generate
 ```
 
-Edit **`.env`** and set at least:
+Windows PowerShell:
 
-| Variable | Purpose |
-|----------|---------|
-| `APP_URL` | Base URL of the app (e.g. `http://localhost:8000`) |
-| `DB_*` | Database connection (see below) |
+```powershell
+Copy-Item .env.example .env
+php artisan key:generate
+```
 
-### Database (MySQL, matches XAMPP defaults)
+### 3) Configure database
 
-Example from `.env.example`:
+Default `.env` values:
 
 ```env
 DB_CONNECTION=mysql
@@ -44,60 +45,86 @@ DB_USERNAME=root
 DB_PASSWORD=
 ```
 
-## 3. Migrate and seed
+Create the DB:
 
-Runs migrations and loads **achievements**, **badges**, and a demo user:
+```sql
+CREATE DATABASE loyalty_app CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
+
+### 4) Run migrations and seeders
 
 ```bash
 php artisan migrate --seed
 ```
 
-Demo user from the seeder (adjust in `DatabaseSeeder` if you change it):
+Seeded data includes:
+- achievements
+- badges
+- 5 users (`UserSeeder` + `UserFactory`)
 
-- Email: `test@example.com`
-- Password: `password`
-
-## 4. Run the application
-
-### API only (typical)
+### 5) Start the app
 
 ```bash
 php artisan serve
 ```
 
-The app is available at **`http://127.0.0.1:8000`** (or the host/port shown in the terminal).
+API base URL: `http://127.0.0.1:8000/api`
 
-## 5. Loyalty API
+## API endpoints
 
-All routes below are prefixed with **`/api`** (Laravel’s API routes).
+- `GET /api/users`  
+  Paginated users (`10` per page), wrapped in Laravel resource response.
 
-| Method | Path | Description |
-|--------|------|-------------|
-| `POST` | `/api/users/{user}/purchase` | Record one purchase: increments `total_orders` by 1, adds `amount` to `total_spent`, dispatches `PurchaseCompleted` (listeners unlock achievements/badges). |
-| `GET` | `/api/users/{user}/achievements` | Returns unlocked / next achievements and badge progress JSON. |
+- `POST /api/users/{user}/purchase`  
+  Request body:
+  ```json
+  { "amount": 1500 }
+  ```
+  Response: `201` with `{"data":[]}`.
 
-`{user}` must be the numeric **user id**.
+- `GET /api/users/{user}/achievements`  
+  Response includes:
+  - `unlocked_achievements`
+  - `next_available_achievements`
+  - `current_badge`
+  - `next_badge`
+  - `remaining_to_unlock_next_badge`
 
-### Example: record a purchase
-
-Body JSON: **`amount`** — integer, whole Naira for this purchase (≥ 0).
+## Quick smoke test
 
 ```bash
-curl -s -X POST http://127.0.0.1:8000/api/users/2/purchase \
+curl -s http://127.0.0.1:8000/api/users
+```
+
+Use a user id from the response:
+
+```bash
+curl -s -X POST http://127.0.0.1:8000/api/users/1/purchase \
   -H "Content-Type: application/json" \
-  -H "Accept: application/json" \
   -d "{\"amount\":1500}"
 ```
 
-Expected: HTTP **201** with `{"ok":true}`.
-
-### Example: fetch loyalty summary
-
 ```bash
-curl -s http://127.0.0.1:8000/api/users/2/achievements \
-  -H "Accept: application/json"
+curl -s http://127.0.0.1:8000/api/users/1/achievements
 ```
+
+## Useful commands
+
+- Reset DB and reseed:
+  ```bash
+  php artisan migrate:fresh --seed
+  ```
+
+## Troubleshooting
+
+- `Unknown database loyalty_app`  
+  Create the database and confirm `.env` credentials.
+
+- Env changes not reflected  
+  ```bash
+  php artisan config:clear
+  ```
 
 ## License
 
-This project inherits the [MIT license](https://opensource.org/licenses/MIT) from the Laravel framework.
+MIT.
