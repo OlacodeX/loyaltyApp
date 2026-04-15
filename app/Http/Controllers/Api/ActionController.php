@@ -16,9 +16,9 @@ class ActionController extends Controller
 {
     public function users(): AnonymousResourceCollection
     {
-        $users = User::select(['id', 'name', 'email', 'total_orders', 'total_spent', 'created_at'])
+        $users = User::select(['id', 'name', 'email', 'total_orders', 'total_spent', 'created_at', 'updated_at'])
                     ->latest()
-                    ->get();
+                    ->paginate(10);
 
         return UserResource::collection($users);
     }
