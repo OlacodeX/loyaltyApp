@@ -30,7 +30,7 @@ class ActionController extends Controller
         $user->total_orders = $user->total_orders + 1;
         $user->total_spent = $user->total_spent + $validated['amount'];
         $user->save();
-
+        $user->refresh();
         PurchaseCompleted::dispatch($user, $validated['amount']);
 
         return response()->json(['data' => []], 201);

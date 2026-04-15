@@ -7,27 +7,21 @@ use App\Events\BadgeUnlocked;
 use App\Events\PurchaseCompleted;
 use App\Models\Achievement;
 use App\Models\Badge;
-use Illuminate\Support\Facades\Log;
 
 class UnlockLoyaltyOnPurchase
 {
     public function handle(PurchaseCompleted $event): void
     {
-        Log::info('UnlockLoyaltyOnPurchase', ['user' => $event->user->id]);
-        $user = $event->user->fresh();
+        $user = $event->user;
         if (!$user) {
             return;
         }
 
-        $attainedAchievement = Achievement::where([
-            'min_total_orders' => $user->total_orders,
-            'min_total_spent' => $user->total_spent,
-        ])->first();
+        $attainedAchievement = Achievement::where('min_total_orders', '<=', $user->total_orders)->where('min_total_spent', '<=', $user->total_spent)->first();
         if (!$attainedAchievement) {
             return;
         }
         $achievementUnlocked = $user->achievements()->where('achievement_id', $attainedAchievement->id)->first();
-
         if(!$achievementUnlocked) {
             $user->achievements()->create([
                 'achievement_id' => $attainedAchievement->id,
@@ -36,11 +30,7 @@ class UnlockLoyaltyOnPurchase
             AchievementUnlocked::dispatch($user, $attainedAchievement);
         }
 
-        $attainedBadge = Badge::where([
-            'min_total_orders' => $user->total_orders,
-            'min_total_spent' => $user->total_spent,
-        ])->first();
-
+        $attainedBadge = Badge::where('min_total_orders', '<=', $user->total_orders)->where('min_total_spent', '<=', $user->total_spent)->first();
         if (!$attainedBadge) {
             return;
         }
