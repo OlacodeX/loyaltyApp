@@ -44,17 +44,16 @@ class ActionController extends Controller
 
         $unlockedAchievement = Achievement::whereIn('id', $unlockedAchievementIds)->pluck('name')->toArray();
 
-        $nextAvailableArr = Achievement::query()
-                        ->whereNotIn('id', $unlockedAchievementIds)
-                        ->pluck('name')->toArray();
+        $nextAvailableArr = Achievement::whereNotIn('id', $unlockedAchievementIds)
+                                        ->pluck('name')
+                                        ->toArray();
 
         $currentBadge = (string) $user->badges->first()?->badge?->name ?? Badge::orderBy('rank')->first()?->name ?? 'none';
 
         $unlockedBadgeIds = $user->badges()->pluck('badge_id');
-        $nextBadgeModel = Badge::query()
-            ->whereNotIn('id', $unlockedBadgeIds)
-            ->orderBy('rank')
-            ->first();
+        $nextBadgeModel = Badge::whereNotIn('id', $unlockedBadgeIds)
+                                ->orderBy('rank')
+                                ->first();
 
         $nextBadge = $nextBadgeModel->name;
 
@@ -65,6 +64,7 @@ class ActionController extends Controller
             'next_available_achievements' => $nextAvailableArr,
             'current_badge' => $currentBadge,
             'next_badge' => $nextBadge,
+            'next_badge_amount' => $nextBadgeModel->min_total_spent,
             'remaining_to_unlock_next_badge' => $remaining,
         ]]);
     }

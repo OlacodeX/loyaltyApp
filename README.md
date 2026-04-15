@@ -10,13 +10,21 @@ Simple loyalty API for users, achievements, and badges.
 
 ## Setup on a new machine
 
-### 1) Install dependencies
+### 1) Clone and checkout the backend branch
+
+```bash
+git clone <your-repo-url>
+cd loyalty-app
+git checkout backend
+```
+
+### 2) Install dependencies
 
 ```bash
 composer install
 ```
 
-### 2) Create env file and app key
+### 3) Create env file and app key
 
 Linux/macOS/Git Bash:
 
@@ -32,7 +40,7 @@ Copy-Item .env.example .env
 php artisan key:generate
 ```
 
-### 3) Configure database
+### 4) Configure database
 
 Default `.env` values:
 
@@ -51,7 +59,7 @@ Create the DB:
 CREATE DATABASE loyalty_app CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
-### 4) Run migrations and seeders
+### 5) Run migrations and seeders
 
 ```bash
 php artisan migrate --seed
@@ -62,7 +70,7 @@ Seeded data includes:
 - badges
 - 5 users (`UserSeeder` + `UserFactory`)
 
-### 5) Start the app
+### 6) Start the app
 
 ```bash
 php artisan serve
