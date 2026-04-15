@@ -8,10 +8,21 @@ use App\Http\Requests\PurchaseRequest;
 use App\Models\Achievement;
 use App\Models\Badge;
 use App\Models\User;
+use App\Http\Resources\UserResource;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class ActionController extends Controller
 {
+    public function users(): AnonymousResourceCollection
+    {
+        $users = User::select(['id', 'name', 'email', 'total_orders', 'total_spent', 'created_at'])
+                    ->latest()
+                    ->get();
+
+        return UserResource::collection($users);
+    }
+
     public function purchase(PurchaseRequest $request, User $user): JsonResponse
     {
         $validated = $request->validated();
@@ -22,7 +33,7 @@ class ActionController extends Controller
 
         PurchaseCompleted::dispatch($user, $validated['amount']);
 
-        return response()->json(['ok' => true], 201);
+        return response()->json(['data' => []], 201);
     }
 
     public function achievements(User $user): JsonResponse
@@ -49,12 +60,12 @@ class ActionController extends Controller
 
         $remaining = (int) $nextBadgeModel->min_total_spent - $user->total_spent;
 
-        return response()->json([
+        return response()->json(['data' => [
             'unlocked_achievements' => $unlockedAchievement,
             'next_available_achievements' => $nextAvailableArr,
             'current_badge' => $currentBadge,
             'next_badge' => $nextBadge,
             'remaining_to_unlock_next_badge' => $remaining,
-        ]);
+        ]]);
     }
 }

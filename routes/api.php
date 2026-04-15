@@ -3,6 +3,8 @@
 use App\Http\Controllers\Api\ActionController;
 use Illuminate\Support\Facades\Route;
 
+Route::get('/users', [ActionController::class, 'users'])->name('users.index');
+
 Route::prefix('users/{user}')
         ->name('users.')
         ->controller(ActionController::class)
