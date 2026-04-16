@@ -5,10 +5,6 @@ React + Vite frontend for:
 - simulate purchase action
 - user achievements dashboard
 
-## Branch
-
-This frontend implementation is on the `frontend` branch.
-
 ## Requirements
 
 - Node.js 18+ (recommended: latest LTS)
