@@ -26,17 +26,8 @@ composer install
 
 ### 3) Create env file and app key
 
-Linux/macOS/Git Bash:
-
 ```bash
 cp .env.example .env
-php artisan key:generate
-```
-
-Windows PowerShell:
-
-```powershell
-Copy-Item .env.example .env
 php artisan key:generate
 ```
 
@@ -68,7 +59,7 @@ php artisan migrate --seed
 Seeded data includes:
 - achievements
 - badges
-- 5 users (`UserSeeder` + `UserFactory`)
+- users
 
 ### 6) Start the app
 
@@ -81,7 +72,7 @@ API base URL: `http://127.0.0.1:8000/api`
 ## API endpoints
 
 - `GET /api/users`  
-  Paginated users (`10` per page), wrapped in Laravel resource response.
+  Paginated users, wrapped in Laravel resource response.
 
 - `POST /api/users/{user}/purchase`  
   Request body:
@@ -97,42 +88,3 @@ API base URL: `http://127.0.0.1:8000/api`
   - `current_badge`
   - `next_badge`
   - `remaining_to_unlock_next_badge`
-
-## Quick smoke test
-
-```bash
-curl -s http://127.0.0.1:8000/api/users
-```
-
-Use a user id from the response:
-
-```bash
-curl -s -X POST http://127.0.0.1:8000/api/users/1/purchase \
-  -H "Content-Type: application/json" \
-  -d "{\"amount\":1500}"
-```
-
-```bash
-curl -s http://127.0.0.1:8000/api/users/1/achievements
-```
-
-## Useful commands
-
-- Reset DB and reseed:
-  ```bash
-  php artisan migrate:fresh --seed
-  ```
-
-## Troubleshooting
-
-- `Unknown database loyalty_app`  
-  Create the database and confirm `.env` credentials.
-
-- Env changes not reflected  
-  ```bash
-  php artisan config:clear
-  ```
-
-## License
-
-MIT.
